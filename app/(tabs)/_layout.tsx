@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 
+
 export default function TabLayout() {
     return (
         <Tabs screenOptions={{ tabBarActiveTintColor: 'blue' }}>
@@ -10,9 +11,15 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="stats"
+                name="event"
                 options={{
-                    title: 'Stats'
+                    title: 'Event'
+                }}
+            />
+            <Tabs.Screen
+                name="sietch"
+                options={{
+                    title: 'Sietch'
                 }}
             />
         </Tabs>
