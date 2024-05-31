@@ -8,10 +8,13 @@ interface ISpiceContext {
     spice: number,
     setSpice: (newSpice: number) => void
 }
+interface SpiceProviderProps {
+    children: React.ReactNode;
+}
 
 export const SpiceContext = createContext({} as ISpiceContext)
 
-export default function SpiceProvider(props) {
+export default function SpiceProvider(props: SpiceProviderProps) {
 
     const [spice, setSpice] = useState(0)
     const getStoredSpice = async () => {
