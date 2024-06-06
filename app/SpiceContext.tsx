@@ -20,11 +20,12 @@ export default function SpiceProvider(props: SpiceProviderProps) {
     const getStoredSpice = async () => {
         try {
             const storedSpice = await AsyncStorage.getItem('my-spice')
-            console.log('storage spice: ', storedSpice)
+            console.log('Getting stored spice: ', storedSpice)
             if (storedSpice !== null) {
                 const spiceNum = parseInt(storedSpice)
                 setSpice(spiceNum)
             } else {
+                console.log('no spice in storage')
                 await AsyncStorage.setItem('my-spice', '0')
             }
         } catch (e) {

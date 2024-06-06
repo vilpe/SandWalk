@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import { Pedometer } from 'expo-sensors'
 import { useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SpiceContext } from '../SpiceContext';
+import { useQuery } from '@tanstack/react-query';
 
 
 export default function Tab() {
@@ -11,13 +12,19 @@ export default function Tab() {
     const [pastStepCount, setPastStepCount] = useState(0)
     const [pedometerAvailable, setPedometerAvailable] = useState<Boolean>(false)
 
+    const { data: spiceData, error: spiceError, isLoading } = useQuery({
+        queryKey: ['spice'],
+        queryFn: async () => {
+            return await AsyncStorage.getItem('my-spice')
+        }
+    })
 
     const checkPedo = async () => {
         try {
             const permission = await Pedometer.requestPermissionsAsync()
             //console.log(permission)
         } catch (e) {
-            console.log(e)
+            console.log('error: ', e)
         }
         const isAvailable = await Pedometer.isAvailableAsync()
         setPedometerAvailable(isAvailable)
@@ -38,6 +45,7 @@ export default function Tab() {
         try {
             const currSpice = await AsyncStorage.getItem('my-spice')
             const spiceString = String(spice)
+            console.log('updating spice to: ', spiceString)
             await AsyncStorage.setItem('my-spice', spiceString)
         } catch (e) {
             console.log(e)
@@ -48,19 +56,33 @@ export default function Tab() {
         const stepper = checkPedo()
         //return () => stepper && stepper.remove()
     }, [])
-    useEffect(() => {
-        gatherSpice()
-        updateStoredSpice()
-    }, [stepCount])
 
+    if (isLoading) {
+        return (
+            <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>
+        )
+    }
+    if (spiceError) {
+        return (
+            <View style={styles.container}>
+                <Text>{spiceError.message}</Text>
+            </View>
+        )
+    }
     return (
         <View style={styles.container}>
-            <Text>Current Spice: {spice}</Text>
+            <Text>Current Spice: {spiceData}</Text>
             <View style={styles.innerContainer}>
                 <Text style={styles.text}>Pedometer available:{pedometerAvailable.toString()}</Text>
                 <Text style={styles.text}>This many steps:</Text>
                 <Text style={styles.text}>{stepCount}</Text>
             </View>
+            <Button
+                onPress={() => { setStepCount(stepCount + 1) }}
+                title="Add spice"
+            />
         </View>
     )
 }
